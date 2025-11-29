@@ -1,0 +1,62 @@
+# CodeRabbit Configuration File
+# Documentation: https://docs.coderabbit.ai/
+
+version: "0.1"
+
+language: "en-US"
+
+early_access: false
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  auto_review:
+    enabled: true
+    ignore_title_keywords:
+      - "WIP"
+      - "Draft"
+    drafts: false
+  
+  # AI Code Review Instructions
+  instructions: |
+    You are a senior healthcare software engineer reviewing the Multilingual Health Assistant project.
+    
+    Please focus your review on these key areas:
+    
+    1. **Healthcare Accessibility**:
+       - Ensure UI elements are large and readable (for elderly users).
+       - Verify that voice features (STT/TTS) are accessible.
+       - Check for high-contrast colors and clear visual feedback.
+    
+    2. **Multilingual Support**:
+       - Verify that hardcoded strings are avoided; suggest moving text to translation files.
+       - Ensure new languages are properly added to the `languages` dictionary in `streamlit_app.py`.
+       - Check that language codes (e.g., 'ml-IN', 'or-IN') are correct.
+    
+    3. **Privacy & Security**:
+       - Ensure no PII (Personally Identifiable Information) is logged.
+       - Verify API keys are NOT hardcoded (must use `os.getenv`).
+       - Check that audio files are temporary and deleted after use.
+    
+    4. **Performance**:
+       - Watch for large file loads or blocking operations in the Streamlit app.
+       - Ensure Docker image sizes are optimized.
+       
+    5. **Code Quality**:
+       - Python: Follow PEP 8 standards.
+       - JavaScript: Ensure clean, modern ES6+ syntax.
+       - Docker: Follow best practices for container security.
+
+  # File patterns to ignore
+  ignore:
+    - "**/package-lock.json"
+    - "**/yarn.lock"
+    - "**/*.min.js"
+    - "**/*.map"
+    - "reminders.db"
+    - "venv/**"
+    - ".git/**"
+
+chat:
+  auto_reply: true

@@ -1,0 +1,16 @@
+======================================================================
+TRANSLATION API STATUS CHECK
+======================================================================
+
+Testing: Hello -> Hindi
+----------------------------------------------------------------------
+Status: 200 OK
+Translation received: YES
+Length: 27 characters
+
+MODE: DEMO MODE (Both APIs failed)
+DEBUG ERROR: OpenAI key not configured.
+LINGO STATUS: ERROR: API key or Project ID not configured
+ACTION: Check backend console for error details
+
+Preview: 'यह एक डेमो अनुवाद है: Hello'

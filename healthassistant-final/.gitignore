@@ -1,0 +1,33 @@
+# Ignore local environment and secret files
+/backend/.env
+/backend/.secrets/
+.env
+.env.local
+
+
+# Node modules / build
+/frontend/node_modules/
+/frontend/build/
+# Python
+venv/
+*.pyc
+__pycache__/
+backend/reminders.db
+.env
+*.env
+
+# Node
+node_modules/
+build/
+dist/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+backend/.env
+frontend/.env
+.env
+

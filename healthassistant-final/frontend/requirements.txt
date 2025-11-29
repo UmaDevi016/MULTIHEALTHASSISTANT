@@ -1,0 +1,7 @@
+streamlit
+requests
+python-dotenv
+streamlit-mic-recorder
+gtts
+SpeechRecognition
+pydub

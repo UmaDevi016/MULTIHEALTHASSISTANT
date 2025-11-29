@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: healthassistant_api
+    ports:
+      - "8000:8000"
+    environment:
+      - LINGO_API_KEY=${LINGO_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ha_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: healthassistant_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - ha_net
+
+networks:
+  ha_net:
+    driver: bridge

@@ -1,0 +1,58 @@
+# Vultr Deployment Configuration
+# Deploy the Multilingual Health Assistant to Vultr
+
+version: "1.0"
+
+deployment:
+  name: health-assistant
+  region: "ewr" # Newark, NJ - Change as needed
+  plan: "vc2-1c-1gb" # 1 CPU, 1GB RAM - upgrade as needed
+  os: "Ubuntu 22.04 x64"
+  
+  environment:
+    - LINGO_API_KEY=${LINGO_API_KEY}
+    - LINGO_PROJECT_ID=${LINGO_PROJECT_ID}
+    - GROQ_API_KEY=${GROQ_API_KEY}
+    - OPENAI_API_KEY=${OPENAI_API_KEY}
+    - BACKEND_URL=http://localhost:8000
+    - NODE_ENV=production
+
+  ports:
+    - "8000:8000" # Backend API
+    - "8501:8501" # Frontend Streamlit
+    - "80:8501"   # HTTP redirect to Streamlit
+    - "443:8501"  # HTTPS (configure SSL)
+
+  setup_commands:
+    - apt-get update
+    - apt-get install -y docker.io docker-compose git nodejs npm
+    - systemctl start docker
+    - systemctl enable docker
+    - npm install -g @lingo/cli
+    
+  deployment_commands:
+    - git clone https://github.com/your-repo/health-assistant.git /app
+    - cd /app
+    - cp .env.example .env
+    - docker-compose up -d --build
+    
+  health_check:
+    endpoint: "/health"
+    interval: 30
+    timeout: 10
+    retries: 3
+
+  volumes:
+    - "/app/backend/reminders.db:/data/reminders.db"
+    
+  backup:
+    enabled: true
+    schedule: "0 2 * * *" # Daily at 2 AM
+    retention_days: 7
+
+notes: |
+  1. Update the environment variables in Vultr dashboard
+  2. Configure DNS to point to the Vultr instance IP
+  3. Set up SSL certificate using Let's Encrypt
+  4. Monitor logs with: docker-compose logs -f
+  5. Update translations with: npm run lingo:sync
