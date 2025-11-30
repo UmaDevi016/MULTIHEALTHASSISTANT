@@ -1,33 +1,21 @@
-# Ignore local environment and secret files
-/backend/.env
-/backend/.secrets/
+# ── Secrets – never commit ─────────────────────
 .env
 .env.local
+/backend/.secrets/
 
-
-# Node modules / build
+# Node modules / build artefacts
 /frontend/node_modules/
-/frontend/build/
-# Python
-venv/
-*.pyc
+frontend/.venv/
+frontend/build/
+
+# Python caches
 __pycache__/
-backend/reminders.db
-.env
-*.env
+*.pyc
 
-# Node
-node_modules/
-build/
-dist/
+# Docker artefacts
+docker-compose.yml
+Dockerfile
 
-# VS Code
-.vscode/
-
-# OS
-.DS_Store
+# OS generated files
 Thumbs.db
-backend/.env
-frontend/.env
-.env
-
+.DS_Store
