@@ -601,10 +601,13 @@ with tab2:
 
 # Health Wallet Section
 with tab3:
-    st.markdown("### 💎 Health Wallet (Ethereum)")
-    st.info("Connect your Ethereum wallet to pay for premium health services.")
+    st.markdown("### 💎 Health Wallet (Multi-Chain)")
+    st.info("Connect your wallet to pay for premium health services.")
     
-    wallet_addr = st.text_input("🔑 Enter Ethereum Address", placeholder="0x...", help="Enter your public ETH address")
+    # Network Selection
+    network = st.selectbox("🌐 Select Network", ["Ethereum (ETH)", "Avalanche (AVAX)"])
+    
+    wallet_addr = st.text_input(f"🔑 Enter {network.split(' ')[0]} Address", placeholder="0x...", help="Enter your public address")
     
     if wallet_addr:
         if st.button("🔍 Check Balance"):
@@ -617,7 +620,8 @@ with tab3:
                         st.caption("Using demo mode")
                     
                     eth_bal = data.get("balance_eth", 0.0)
-                    st.metric("ETH Balance", f"{eth_bal:.4f} ETH")
+                    eth_bal = data.get("balance_eth", 0.0)
+                    st.metric(f"{network.split(' ')[1]} Balance", f"{eth_bal:.4f} {network.split(' ')[1]}")
                     
                     if eth_bal > 0:
                         st.success("✅ Wallet Connected")
@@ -637,20 +641,31 @@ with tab3:
         <div class="custom-card">
             <h4>👨‍⚕️ Tele-Consultation</h4>
             <p>Video call with a specialist</p>
-            <h3>0.05 ETH</h3>
+            <h3>0.05 ETH / 2 AVAX</h3>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Pay 0.05 ETH", key="pay_consult"):
+        if st.button("Pay Now (Consultation)", key="pay_consult"):
             if not wallet_addr:
                 st.error("Please enter wallet address first")
             else:
                 with st.spinner("Processing transaction..."):
                     try:
-                        r = requests.post(f"{BACKEND}/eth/pay", json={
-                            "sender": wallet_addr,
-                            "amount": 0.05,
-                            "service": "Tele-Consultation"
-                        })
+
+                        
+                        # Handle Payment Logic based on Network
+                        if "Avalanche" in network:
+                             r = requests.post(f"{BACKEND}/avax/pay", json={
+                                "sender": wallet_addr,
+                                "receiver": "0xbFbFf08635aE0a6533291e08f5166417cd0a0479", # Demo receiver
+                                "amount": 2.0,
+                                "service": "Tele-Consultation"
+                            })
+                        else:
+                             r = requests.post(f"{BACKEND}/eth/pay", json={
+                                "sender": wallet_addr,
+                                "amount": 0.05,
+                                "service": "Tele-Consultation"
+                            })
                         if r.ok:
                             st.balloons()
                             st.success("✅ Payment Successful! Doctor will join shortly.")
@@ -665,20 +680,31 @@ with tab3:
         <div class="custom-card">
             <h4>📑 Health Report</h4>
             <p>AI analysis of your records</p>
-            <h3>0.01 ETH</h3>
+            <h3>0.01 ETH / 0.5 AVAX</h3>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Pay 0.01 ETH", key="pay_report"):
+        if st.button("Pay Now (Report)", key="pay_report"):
             if not wallet_addr:
                 st.error("Please enter wallet address first")
             else:
                 with st.spinner("Processing transaction..."):
                     try:
-                        r = requests.post(f"{BACKEND}/eth/pay", json={
-                            "sender": wallet_addr,
-                            "amount": 0.01,
-                            "service": "Health Report"
-                        })
+
+
+                        # Handle Payment Logic based on Network
+                        if "Avalanche" in network:
+                             r = requests.post(f"{BACKEND}/avax/pay", json={
+                                "sender": wallet_addr,
+                                "receiver": "0xbFbFf08635aE0a6533291e08f5166417cd0a0479", # Demo receiver
+                                "amount": 0.5,
+                                "service": "Health Report"
+                            })
+                        else:
+                             r = requests.post(f"{BACKEND}/eth/pay", json={
+                                "sender": wallet_addr,
+                                "amount": 0.01,
+                                "service": "Health Report"
+                            })
                         if r.ok:
                             st.balloons()
                             st.success("✅ Payment Successful! Report generating...")

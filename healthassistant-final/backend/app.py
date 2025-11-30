@@ -14,6 +14,7 @@ import httpx
 import openai
 from dotenv import load_dotenv
 from web3 import Web3
+import secrets
 
 
 # optional TTS
@@ -39,6 +40,10 @@ ETH_RPC_URL = os.getenv("ETH_RPC_URL", "https://cloudflare-eth.com") # Public RP
 
 # Initialize Web3
 w3 = Web3(Web3.HTTPProvider(ETH_RPC_URL))
+
+# AVAX RPC (default public endpoint; can be overridden via .env)
+AVAX_RPC_URL = os.getenv("AVAX_RPC_URL", "https://api.avax.network/ext/bc/C/rpc")
+w3_avax = Web3(Web3.HTTPProvider(AVAX_RPC_URL))
 
 
 print(f"LINGO_API_KEY: {'Set' if LINGO_API_KEY else 'Not Set'}")
@@ -101,6 +106,11 @@ class EthPaymentRequest(BaseModel):
     sender: str
     amount: float
     service: str
+
+class AvaxPaymentRequest(BaseModel):
+    sender: str
+    receiver: str
+    amount: float  # AVAX amount
 
 
 # Helpers
@@ -360,15 +370,43 @@ def get_eth_balance(req: EthBalanceRequest):
 def process_payment(req: EthPaymentRequest):
     # In a real app, this would verify a signed transaction hash
     # For this demo, we verify the address and simulate success
-    if not w3.is_address(req.sender):
+    # Validate Ethereum address and amount
+    if not Web3.isAddress(req.sender):
         raise HTTPException(status_code=400, detail="Invalid Ethereum address")
-        
+    if req.amount <= 0:
+        raise HTTPException(status_code=400, detail="Payment amount must be positive")
+    # Simulate a successful payment (mock transaction hash)
     return {
         "status": "success",
-        "transaction_hash": "0x" + "a" * 64, # Mock hash
+        "transaction_hash": "0x" + "a" * 64,  # Mock hash
         "amount": req.amount,
         "currency": "ETH",
         "service": req.service,
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+
+@app.post("/avax/pay")
+def avax_process_payment(req: AvaxPaymentRequest):
+    # Validate addresses
+    if not w3_avax.is_address(req.sender):
+        raise HTTPException(status_code=400, detail="Invalid AVAX sender address")
+    if not w3_avax.is_address(req.receiver):
+        raise HTTPException(status_code=400, detail="Invalid AVAX receiver address")
+    if req.amount <= 0:
+        raise HTTPException(status_code=400, detail="Payment amount must be positive")
+
+    # Simulate contract creation & transaction
+    contract_address = "0x" + secrets.token_hex(20)   # 40-hex chars -> 20 bytes
+    tx_hash = "0x" + secrets.token_hex(32)           # 64-hex chars -> 32 bytes
+
+    return {
+        "status": "success",
+        "transaction_hash": tx_hash,
+        "contract_address": contract_address,
+        "amount": req.amount,
+        "currency": "AVAX",
+        "sender": req.sender,
+        "receiver": req.receiver,
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
 
